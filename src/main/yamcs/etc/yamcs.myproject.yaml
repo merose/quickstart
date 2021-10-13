@@ -17,6 +17,8 @@ services:
     args:
       realtimeFiller:
         enabled: true
+        sortingThreshold: 60000
+        pastJumpThreshold: 0
       backFiller:
         enabled: false
         warmupTime: 60
@@ -26,7 +28,11 @@ dataLinks:
     class: org.yamcs.tctm.UdpTmDataLink
     stream: tm_realtime
     port: 10015
-    packetPreprocessorClassName: com.example.myproject.MyPacketPreprocessor
+    packetPreprocessorClassName: org.yamcs.tctm.GenericPacketPreprocessor
+    packetPreprocessorArgs:
+      timestampOffset: 0
+      seqCountOffset:  4
+      byteOrder: BIG_ENDIAN
 
   - name: udp-out
     class: org.yamcs.tctm.UdpTcDataLink

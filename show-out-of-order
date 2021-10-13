@@ -1,0 +1,14 @@
+#! /bin/bash
+
+BIG_OFFSET=38000
+
+echo "Interval boundary is 2021-10-07T20:44:24.960Z"
+python3 send_packets.py --time 2021-10-07T20:44:23 --second-packet-offset 4000 1 2
+sleep 1
+python3 show_archived_values.py 
+python3 send_packets.py --time 2021-10-07T20:44:25 --second-packet-offset -$BIG_OFFSET 3 4
+sleep 1
+python3 show_archived_values.py 
+python3 send_packets.py --time 2021-10-07T20:44:00 --second-packet-offset $BIG_OFFSET 5 6
+sleep 1
+python3 show_archived_values.py 
