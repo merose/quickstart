@@ -31,3 +31,7 @@ the invariant that segments should not overlap in time, for the same
 parameter set. After that database corruption, when retrieving values,
 the retrieval API can send a continuation token with a timestamp
 that causes the retrieval to loop, infinitely.
+
+Reported as https://github.com/yamcs/yamcs/issues/617
+
+Fixed 2021-10-08 in commit https://github.com/yamcs/yamcs/commit/ebffb7358786397af63aead20554019157b23fd3
