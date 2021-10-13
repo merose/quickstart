@@ -16,17 +16,22 @@ services:
   - class: org.yamcs.parameterarchive.ParameterArchive
     args:
       realtimeFiller:
-        enabled: true
-      backFiller:
         enabled: false
+      backFiller:
+        enabled: true
         warmupTime: 60
+        streamUpdateFillFrequency: 10
 
 dataLinks:
   - name: udp-in
     class: org.yamcs.tctm.UdpTmDataLink
     stream: tm_realtime
     port: 10015
-    packetPreprocessorClassName: com.example.myproject.MyPacketPreprocessor
+    packetPreprocessorClassName: org.yamcs.tctm.GenericPacketPreprocessor
+    packetPreprocessorArgs:
+      timestampOffset: 0
+      seqCountOffset:  4
+      byteOrder: BIG_ENDIAN
 
   - name: udp-out
     class: org.yamcs.tctm.UdpTcDataLink

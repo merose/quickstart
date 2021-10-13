@@ -1,0 +1,7 @@
+#! /bin/bash
+
+python3 send_packets.py 1 2
+sleep 10
+python3 send_packets.py --second-packet-offset -60000 3 4
+sleep 10
+python3 show_archived_values.py --page-size 1
