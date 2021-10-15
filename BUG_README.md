@@ -40,7 +40,7 @@ Build the quickstart project normally using mvn.
 In a new terminal window, look for messages from the custom algorithm
 indicating a new algorithm result:
 
-    $ tail -f target/bundle-tmp/log/yamcs.myproject.log.0 | grep 'Returning one'
+    $ tail -f target/bundle-tmp/log/yamcs-server.log.0 | grep 'Returning one'
 
 In another terminal window, send a packet with an old timestamp:
 
