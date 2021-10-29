@@ -43,6 +43,9 @@ Build the quickstart project normally using mvn.
 
 ## Exhibiting the bug
 
+You can run the shell script `show-no-aggregate-value`, or use the
+step-by-step instructions that follow.
+
 In a terminal window, send a packet with a value of an aggregate
 parameter:
 
