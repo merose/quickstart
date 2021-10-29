@@ -21,35 +21,25 @@
                 <IntegerDataEncoding encoding="unsigned" sizeInBits="32"
                     byteOrder="mostSignificantByteFirst"/>
             </IntegerParameterType>
+            <AggregateParameterType name="aggregate">
+                <MemberList>
+                    <Member typeRef="uint32_t" name="value"></Member>
+                </MemberList>
+            </AggregateParameterType>
         </ParameterTypeSet>
         <ParameterSet>
             <Parameter name="packetTime" parameterTypeRef="PacketTime"/>
             <Parameter name="packetSequenceCount" parameterTypeRef="PacketSequenceCount"/>
-            <Parameter name="value" parameterTypeRef="uint32_t"/>
-            <Parameter name="computedValue" parameterTypeRef="uint32_t"/>
+            <Parameter name="structure" parameterTypeRef="aggregate"/>
         </ParameterSet>
         <ContainerSet>
             <SequenceContainer name="Spacecraft">
                 <EntryList>
                     <ParameterRefEntry parameterRef="packetTime"/>
                     <ParameterRefEntry parameterRef="packetSequenceCount"/>
-                    <ParameterRefEntry parameterRef="value"/>
+                    <ParameterRefEntry parameterRef="structure"/>
                 </EntryList>
             </SequenceContainer>
         </ContainerSet>
-        <AlgorithmSet>
-            <CustomAlgorithm name="oneResultAlgorithm">
-                <AlgorithmText language="Java">com.example.myproject.OneResultAlgorithm()</AlgorithmText>
-                <InputSet>
-                    <InputParameterInstanceRef parameterRef="value"/>
-                </InputSet>
-                <OutputSet>
-                    <OutputParameterRef parameterRef="computedValue"/>
-                </OutputSet>
-                <TriggerSet>
-                    <OnParameterUpdateTrigger parameterRef="value"/>
-                </TriggerSet>
-            </CustomAlgorithm>
-        </AlgorithmSet>
     </TelemetryMetaData>
 </SpaceSystem>
