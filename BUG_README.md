@@ -1,12 +1,12 @@
 # Cannot retrieve aggregate parameter from archive
 
-This modification to quickstart sets up a scenario where an aggregate
-value is inserted into the parameter archive. The aggregate parameter
-can then be retrieved using the processor API. However, the archive
-API cannot return the aggregate parameter value. Instead, you must
-ask for an aggregate member value. This is much less convenient for
-client scripts, of course, and makes them more brittle, since they
-have to specify each member of the aggregate that they want to retrieve.
+This modification to quickstart is used to send telemetry at a high
+rate, in order to show that the realtime archiver cache fills up and
+is not flushed, even for segments older than the sortingThreshold.
+
+The manifests in two ways: first, there are warning messages in the
+Yamcs log. Second, retrieval of the value using the archive API no
+longer works for the parameter, even after a Yamcs restart.
 
 ## Environment
 
@@ -15,8 +15,12 @@ Found in Yamcs 5.5.5
 ## Overview
 
 This modification to the quickstart project replaces the XTCE with a
-simpler model that has a single packet, with a single, aggregate
-parameter inside.
+simpler model that has a single packet with a single parameter inside.
+
+It also adds a Python utility to send packets with varying values for
+the single parameter. A command line option allows specifying the
+delay between packets. A small delay allows showing the behavior
+sooner.
 
 It also updates the Yamcs reference to Yamcs 5.5.5.
 
@@ -31,7 +35,7 @@ The usual requirements for building the Yamcs quickstart project, plus:
 
 Clone branch of a copy of the quickstart project:
 
-    $ git clone -b aggregate-no-history git@github.com:merose/quickstart.git
+    $ git clone -b cache-not-flushing git@github.com:merose/quickstart.git
 
 Build the quickstart project normally using mvn.
 
@@ -43,85 +47,89 @@ Build the quickstart project normally using mvn.
 
 ## Exhibiting the bug
 
-You can run the shell script `show-no-aggregate-value`, or use the
-step-by-step instructions that follow.
+In a terminal window, start the utility that sends packets.
 
-In a terminal window, send a packet with a value of an aggregate
-parameter:
+    $ python3 send_packets.py --delay 1
 
-    $ python3 send_packet.py 123
-
-This works, getting the current parameter value:
+In another terminal window, you can now retrieve values using the
+archive API:
 
 ~~~
-$ curl 'http://localhost:8090/api/processors/myproject/realtime/parameters/myproject/structure'
-{
-  "id": {
-    "name": "structure",
-    "namespace": "/myproject"
-  },
-  "rawValue": {
-    "type": "AGGREGATE",
-    "aggregateValue": {
-      "name": ["value"],
-      "value": [{
-        "type": "UINT32",
-        "uint32Value": 123
-      }]
-    }
-  },
-  "engValue": {
-    "type": "AGGREGATE",
-    "aggregateValue": {
-      "name": ["value"],
-      "value": [{
-        "type": "UINT32",
-        "uint32Value": 123
-      }]
-    }
-  },
-  "acquisitionTime": "2021-10-29T00:02:38.241Z",
-  "generationTime": "2021-10-29T00:02:38Z",
-  "acquisitionStatus": "ACQUIRED",
-  "acquisitionTimeUTC": "2021-10-29T00:02:38.241Z",
-  "generationTimeUTC": "2021-10-29T00:02:38.000Z"
-  }$
- ~~~
-
-However, retrieving from the archive does not work for the aggregate
-parameter:
-
-~~~
-$ curl 'http://localhost:8090/api/archive/myproject/parameters/myproject/structure'
-{
-}$
-~~~
-
-while requesting the aggregate member works:
-
-~~~
-$ curl 'http://localhost:8090/api/archive/myproject/parameters/myproject/structure.value'
+$ curl 'http://localhost:8090/api/archive/myproject/parameters/myproject/value?limit=2'
 {
   "parameter": [{
     "id": {
-      "name": "structure.value",
+      "name": "value",
       "namespace": "/myproject"
     },
     "rawValue": {
       "type": "UINT32",
-      "uint32Value": 123
+      "uint32Value": 1051
     },
     "engValue": {
       "type": "UINT32",
-      "uint32Value": 123
+      "uint32Value": 1051
     },
-    "generationTime": "2021-10-29T00:02:38Z",
+    "generationTime": "2021-10-29T20:45:21.349Z",
     "acquisitionStatus": "ACQUIRED",
-    "generationTimeUTC": "2021-10-29T00:02:38.000Z"
-  }]
-  }$
+    "generationTimeUTC": "2021-10-29T20:45:21.349Z"
+  }, {
+    "id": {
+      "name": "value",
+      "namespace": "/myproject"
+    },
+    "rawValue": {
+      "type": "UINT32",
+      "uint32Value": 1052
+    },
+    "engValue": {
+      "type": "UINT32",
+      "uint32Value": 1052
+    },
+    "generationTime": "2021-10-29T20:45:21.348Z",
+    "acquisitionStatus": "ACQUIRED",
+    "generationTimeUTC": "2021-10-29T20:45:21.348Z"
+  }],
+  "continuationToken": "eyJ0aW1lIjoxNjM1NTQwMzU4MzQ2fQ"
+}$
 ~~~
+
+Now wait about 2 minutes. There will be warnings in the Yamcs log like
+this:
+
+~~~
+$ egrep 'WARN|ERROR' target/bundle-tmp/log/yamcs-server.log.0 | head -3
+Oct 29 13:47:06.829 myproject [19] org.yamcs.parameterarchive.RealtimeArchiveFiller [WARNING] Realtime parameter archive queue full.Consider increasing the writerThreads (if CPUs are available) or using a back filler
+Oct 29 13:47:06.830 myproject [19] org.yamcs.parameterarchive.RealtimeArchiveFiller [WARNING] Realtime parameter archive queue full.Consider increasing the writerThreads (if CPUs are available) or using a back filler
+Oct 29 13:47:06.832 myproject [19] org.yamcs.parameterarchive.RealtimeArchiveFiller [WARNING] Realtime parameter archive queue full.Consider increasing the writerThreads (if CPUs are available) or using a back filler
+$
+~~~
+
+After that point, the archive API does not return any results.
+
+~~~
+$ curl 'http://localhost:8090/api/archive/myproject/parameters/myproject/value?limit=2'
+{
+}$
+~~~
+
+Even stoping the process that is sending parameters, the archive API
+fails to work. It appears that the cache will begin flushing when the
+next interval starts (if telemetry is flowing), and the archive API
+might start working again.
+
+It also appears that the cache is not flushed when stopping Yamcs,
+because the archive API still returns no results.
 
 # Discussion
 
-It seems like the processor API and the archive API should be consistent.
+There appear to be two issues, the second by design.
+
+1. Cache segments are not flushed until a new interval starts, even if
+   the segments are older than the current time minus the
+   sortingThreshold.
+
+2. Cache segments are never flushed until new telemetry arrives or
+   Yamcs is shut down. To avoid data loss due to crashes, it seems
+   safer to flush cache segments after a period of idle time, even if
+   no new telemetry arrives.

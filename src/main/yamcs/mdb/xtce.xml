@@ -21,23 +21,18 @@
                 <IntegerDataEncoding encoding="unsigned" sizeInBits="32"
                     byteOrder="mostSignificantByteFirst"/>
             </IntegerParameterType>
-            <AggregateParameterType name="aggregate">
-                <MemberList>
-                    <Member typeRef="uint32_t" name="value"></Member>
-                </MemberList>
-            </AggregateParameterType>
         </ParameterTypeSet>
         <ParameterSet>
             <Parameter name="packetTime" parameterTypeRef="PacketTime"/>
             <Parameter name="packetSequenceCount" parameterTypeRef="PacketSequenceCount"/>
-            <Parameter name="structure" parameterTypeRef="aggregate"/>
+            <Parameter name="value" parameterTypeRef="uint32_t"/>
         </ParameterSet>
         <ContainerSet>
             <SequenceContainer name="Spacecraft">
                 <EntryList>
                     <ParameterRefEntry parameterRef="packetTime"/>
                     <ParameterRefEntry parameterRef="packetSequenceCount"/>
-                    <ParameterRefEntry parameterRef="structure"/>
+                    <ParameterRefEntry parameterRef="value"/>
                 </EntryList>
             </SequenceContainer>
         </ContainerSet>
