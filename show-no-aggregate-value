@@ -18,4 +18,4 @@ echo "*** Retrieving the aggregate from the archive API fails ***"
 echo_and_run curl 'http://localhost:8090/api/archive/myproject/parameters/myproject/structure'
 
 echo "*** But retrieving the aggregate member works ***"
-curl 'http://localhost:8090/api/archive/myproject/parameters/myproject/structure.value'
+echo_and_run curl 'http://localhost:8090/api/archive/myproject/parameters/myproject/structure.value'
