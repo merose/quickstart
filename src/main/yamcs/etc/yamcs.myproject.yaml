@@ -16,11 +16,10 @@ services:
   - class: org.yamcs.parameterarchive.ParameterArchive
     args:
       realtimeFiller:
-        enabled: false
-      backFiller:
         enabled: true
-        warmupTime: 0
-        streamUpdateFillFrequency: 10
+      backFiller:
+        enabled: false
+        warmupTime: 60
 
 dataLinks:
   - name: udp-in
