@@ -4,6 +4,56 @@
     xsi:schemaLocation="http://www.omg.org/spec/XTCE/20180204 https://www.omg.org/spec/XTCE/20180204/SpaceSystem.xsd">
     <TelemetryMetaData>
         <ParameterTypeSet>
+            <AggregateParameterType name="CCSDS_Packet_ID_Type">
+                <MemberList>
+                    <Member name="Version" typeRef="CCSDS_Version_Type" />
+                    <Member name="Type" typeRef="CCSDS_Type_Type" />
+                    <Member name="SecHdrFlag" typeRef="CCSDS_Sec_Hdr_Flag_Type" />
+                    <Member name="APID" typeRef="CCSDS_APID_Type" />
+                </MemberList>
+            </AggregateParameterType>
+            <IntegerParameterType name="CCSDS_Version_Type" signed="false">
+                <UnitSet />
+                <IntegerDataEncoding sizeInBits="3" />
+            </IntegerParameterType>
+            <BooleanParameterType name="CCSDS_Type_Type" zeroStringValue="TM" oneStringValue="TC">
+                <UnitSet />
+                <IntegerDataEncoding sizeInBits="1" />
+            </BooleanParameterType>
+            <BooleanParameterType name="CCSDS_Sec_Hdr_Flag_Type" zeroStringValue="NotPresent" oneStringValue="Present">
+                <UnitSet />
+                <IntegerDataEncoding sizeInBits="1" />
+            </BooleanParameterType>
+            <IntegerParameterType name="CCSDS_APID_Type" signed="false">
+                <UnitSet />
+                <IntegerDataEncoding sizeInBits="11" />
+            </IntegerParameterType>
+            <AggregateParameterType name="CCSDS_Packet_Sequence_Type">
+                <MemberList>
+                    <Member name="GroupFlags" typeRef="CCSDS_Group_Flags_Type" />
+                    <Member name="Count" typeRef="CCSDS_Source_Sequence_Count_Type" />
+                </MemberList>
+            </AggregateParameterType>
+            <EnumeratedParameterType name="CCSDS_Group_Flags_Type">
+                <UnitSet />
+                <IntegerDataEncoding sizeInBits="2" />
+                <EnumerationList>
+                    <Enumeration value="0" label="Continuation" />
+                    <Enumeration value="1" label="First" />
+                    <Enumeration value="2" label="Last" />
+                    <Enumeration value="3" label="Standalone" />
+                </EnumerationList>
+            </EnumeratedParameterType>
+            <IntegerParameterType name="CCSDS_Source_Sequence_Count_Type" signed="false">
+                <UnitSet />
+                <IntegerDataEncoding sizeInBits="14" />
+            </IntegerParameterType>
+            <IntegerParameterType name="CCSDS_Packet_Length_Type" signed="false" initialValue="0">
+                <UnitSet>
+                    <Unit description="Size">Octets</Unit>
+                </UnitSet>
+                <IntegerDataEncoding sizeInBits="16" />
+            </IntegerParameterType>
             <IntegerParameterType name="PacketSequenceCount" sizeInBits="32">
                 <IntegerDataEncoding sizeInBits="32" byteOrder="mostSignificantByteFirst"
                     encoding="unsigned"/>
@@ -23,17 +73,46 @@
             </IntegerParameterType>
         </ParameterTypeSet>
         <ParameterSet>
+            <Parameter name="CCSDS_Packet_ID" parameterTypeRef="CCSDS_Packet_ID_Type" />
+            <Parameter name="CCSDS_Packet_Sequence" parameterTypeRef="CCSDS_Packet_Sequence_Type" />
+            <Parameter name="CCSDS_Packet_Length" parameterTypeRef="CCSDS_Packet_Length_Type" />
             <Parameter name="packetTime" parameterTypeRef="PacketTime"/>
             <Parameter name="packetSequenceCount" parameterTypeRef="PacketSequenceCount"/>
             <Parameter name="value" parameterTypeRef="uint32_t"/>
         </ParameterSet>
         <ContainerSet>
+            <SequenceContainer abstract="true" name="CCSDSPacket">
+                <EntryList>
+                    <ParameterRefEntry parameterRef="CCSDS_Packet_ID" />
+                    <ParameterRefEntry parameterRef="CCSDS_Packet_Sequence" />
+                    <ParameterRefEntry parameterRef="CCSDS_Packet_Length" />
+                </EntryList>
+            </SequenceContainer>
+            <SequenceContainer name="TelemetryPacket">
+                <EntryList />
+                <BaseContainer containerRef="CCSDSPacket">
+                    <RestrictionCriteria>
+                        <ComparisonList>
+                            <Comparison value="0" parameterRef="CCSDS_Packet_ID/Version" />
+                            <Comparison value="TM" parameterRef="CCSDS_Packet_ID/Type" />
+                        </ComparisonList>
+                    </RestrictionCriteria>
+                </BaseContainer>
+            </SequenceContainer>
             <SequenceContainer name="Spacecraft">
                 <EntryList>
                     <ParameterRefEntry parameterRef="packetTime"/>
                     <ParameterRefEntry parameterRef="packetSequenceCount"/>
                     <ParameterRefEntry parameterRef="value"/>
                 </EntryList>
+                <BaseContainer containerRef="TelemetryPacket">
+                    <RestrictionCriteria>
+                        <ComparisonList>
+                            <Comparison value="NotPresent" parameterRef="CCSDS_Packet_ID/SecHdrFlag" />
+                            <Comparison value="100" parameterRef="CCSDS_Packet_ID/APID"/>
+                        </ComparisonList>
+                    </RestrictionCriteria>
+                </BaseContainer>
             </SequenceContainer>
         </ContainerSet>
     </TelemetryMetaData>

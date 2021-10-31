@@ -28,8 +28,8 @@ dataLinks:
     port: 10015
     packetPreprocessorClassName: org.yamcs.tctm.GenericPacketPreprocessor
     packetPreprocessorArgs:
-      timestampOffset: 0
-      seqCountOffset:  4
+      timestampOffset: 6
+      seqCountOffset:  14
       byteOrder: BIG_ENDIAN
 
   - name: udp-out
