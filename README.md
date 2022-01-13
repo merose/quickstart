@@ -12,7 +12,16 @@ typical when using NASA cFS as the flight software framework.
 * Linux x64 or macOS
 
 
-## Configuration
+## Project configuration
+
+You will likely want to rename the project. This is set in pom.xml in
+the `<groupid>` and `<artifactid>` tags. You will also want to set the
+version in the `<version>` tag. If you want to add custom Java, you
+may need to add additional dependencies. See the Maven documentation
+for more details.
+
+
+## Runtime configuration
 
 See src/main/yamcs/README.md for information about configuring the
 running system.
