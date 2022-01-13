@@ -21,10 +21,11 @@ systems.
 There is a script in scripts/send_packet.py that allows sending a
 single packet of telemetry. Use the "-h" option to get usage
 information on that script. As an example, here is a command line that
-sends the packet /myproject/sample/telemetry
+sends the packet /myproject/sample/telemetry with a value of 3 for the
+testValue parameter, and displays the hex of the sent packet.
 
-    $ python3 scripts/send_packet.py --apid 100 --sequence-count 1 \
-        jjj
+    $ python3 scripts/send_packet.py --apid 2046 --sequence-count 1 \
+        --field 'B:3' --verbose
 
 
 ## Telecommanding
