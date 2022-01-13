@@ -128,7 +128,6 @@
         <IntegerDataEncoding sizeInBits="11" encoding="unsigned"/>
         <EnumerationList>
           <!-- Insert additional APIDs here -->
-          <Enumeration value="255" label="TRIO_CMD"/>
           <Enumeration value="2046" label="SAMPLE_APID"/>
           <Enumeration value="2047" label="CCSDS_IDLE"/>
         </EnumerationList>
@@ -152,8 +151,7 @@
         <IntegerDataEncoding sizeInBits="8" encoding="unsigned"/>
         <EnumerationList>
           <!-- Insert additional opcodes here -->
-          <Enumeration value="133" label="TRIO_CDH_GET_MEM"/>
-          <Enumeration value="2047" label="SAMPLE_CMD"/>
+          <Enumeration value="255" label="SAMPLE_CMD"/>
         </EnumerationList>
       </EnumeratedArgumentType>
       <IntegerArgumentType name="cFS_Checksum_Type">
