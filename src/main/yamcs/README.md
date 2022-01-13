@@ -8,6 +8,19 @@ want to consult the main README in the source root directory for more
 information about building and running the project.
 
 
+## Adding your own XTCE
+
+You can add one or more XTCE files into mdb/subsystems/ (or
+src/main/yamcs/mdb/subsystems/ in the source tree). Each
+SequenceContainer should derive from /Ccsds/TelemetryHeader and each
+MetaCommand should derive from /Ccsds/CommandHeader. The APIDs for
+each container or command should be added to mdb/ccsds.xml in the
+`CCSDS_APID_Type` type definitions in the `<ParameterTypeSet>` or
+`<ArgumentTypeSet>` sections. In addition, the opcodes for any
+commands must be added to the `cFS_Opcode_Type` definition in the
+`<ArgumentTypeSet>` section.
+
+
 ## Running Yamcs
 
 The `yamcsd` program in the bin directory can be used to start
