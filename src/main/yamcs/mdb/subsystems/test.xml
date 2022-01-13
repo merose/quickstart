@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SpaceSystem name="test" xmlns="http://www.omg.org/spec/XTCE/20180204" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.omg.org/spec/XTCE/20180204 https://www.omg.org/spec/XTCE/20180204/SpaceSystem.xsd">
+	
+	<TelemetryMetaData>
+		<ParameterTypeSet>
+			<EnumeratedParameterType name="TestValueType">
+				<IntegerDataEncoding sizeInBits="8" encoding="unsigned"/>
+				<EnumerationList>
+					<Enumeration value="0" label="Zero"/>
+					<Enumeration value="1" label="One"/>
+					<Enumeration value="2" label="Two"/>
+					<Enumeration value="3" label="Three"/>
+				</EnumerationList>
+			</EnumeratedParameterType>
+		</ParameterTypeSet>
+		<ParameterSet>
+			<Parameter parameterTypeRef="TestValueType" name="testValue"/>
+		</ParameterSet>
+		<ContainerSet>
+			<SequenceContainer name="TestTlm">
+				<EntryList>
+					<ParameterRefEntry parameterRef="testValue"/>
+				</EntryList>
+				<BaseContainer containerRef="/Ccsds/TelemetryHeader">
+					<RestrictionCriteria>
+						<Comparison value="TEST_TLM" parameterRef="/Ccsds/apid"/>
+					</RestrictionCriteria>
+				</BaseContainer>
+			</SequenceContainer>
+		</ContainerSet>
+	</TelemetryMetaData>
+	
+	<CommandMetaData>
+		<ArgumentTypeSet>
+			<EnumeratedArgumentType name="ModeType">
+				<IntegerDataEncoding sizeInBits="8" encoding="unsigned"/>
+				<EnumerationList>
+					<Enumeration value="0" label="NORMAL"/>
+					<Enumeration value="1" label="SAFE"/>
+					<Enumeration value="2" label="IDLE"/>
+				</EnumerationList>
+			</EnumeratedArgumentType>
+		</ArgumentTypeSet>
+		<MetaCommandSet>
+			<MetaCommand name="SetMode">
+				<BaseMetaCommand metaCommandRef="/Ccsds/CommandHeader">
+					<ArgumentAssignmentList>
+						<ArgumentAssignment argumentName="apid" argumentValue="SAMPLE_APID"/>
+						<ArgumentAssignment argumentName="opCode" argumentValue="SAMPLE_CMD"/>
+					</ArgumentAssignmentList>
+				</BaseMetaCommand>
+				<ArgumentList>
+					<Argument argumentTypeRef="ModeType" name="mode"/>
+				</ArgumentList>
+				<CommandContainer name="SetModeContainer">
+					<EntryList>
+						<ArgumentRefEntry argumentRef="mode"/>
+					</EntryList>
+				</CommandContainer>
+			</MetaCommand>
+		</MetaCommandSet>
+	</CommandMetaData>
+	
+</SpaceSystem>

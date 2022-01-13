@@ -1,8 +1,8 @@
-# Yamcs QuickStart
+# Yamcs QuickStart project source for CCSDS/cFS projects
 
-This repository holds the source code to start a basic Yamcs application that monitors a simulated spacecraft in low earth orbit.
-
-You may find it useful as a starting point for your own project.
+This is a variation on the Yamcs quickstart project that is customized
+to projects that use CCSDS packets for telemetry and commanding, as is
+typical when using NASA cFS as the flight software framework.
 
 
 ## Prerequisites
@@ -10,6 +10,26 @@ You may find it useful as a starting point for your own project.
 * Java 11
 * Maven 3.1+
 * Linux x64 or macOS
+
+
+## Configuration
+
+See src/main/yamcs/README.md for information about configuring the
+running system.
+
+
+## Customization
+
+There are two supplied Java classes to customize the Yamcs
+behavior. One, MyCommandPostProcessor.java, is identical to that
+provided by the Yamcs quickstart in the master branch. It is not used
+in the supplied configuration here.
+
+The other file, MyPacketPreprocessor.java, is customized from that in
+the base Yamcs quickstart project. It allows configuration of the time
+format in the CCSDS secondary header, in order to fill in the packet
+generation time. See the documentation in src/main/yamcs/README.md for
+configuration information, or the source code for more details.
 
 
 ## Running Yamcs
@@ -33,22 +53,6 @@ Delete all generated outputs and start over:
     mvn clean
 
 This will also delete Yamcs data. Change the `dataDir` property in `yamcs.yaml` to another location on your file system if you don't want that.
-
-
-## Telemetry
-
-To start pushing CCSDS packets into Yamcs, run the included Python script:
-
-    python simulator.py
-
-This script will send packets at 1 Hz over UDP to Yamcs. There is enough test data to run for a full calendar day.
-
-The packets are a bit artificial and include a mixture of HK and accessory data.
-
-
-## Telecommanding
-
-This project defines a few example CCSDS telecommands. They are sent to UDP port 10025. The simulator.py script listens to this port. Commands  have no side effects. The script will only count them.
 
 
 ## Bundling

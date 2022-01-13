@@ -25,22 +25,34 @@ dataLinks:
   - name: udp-in
     class: org.yamcs.tctm.UdpTmDataLink
     stream: tm_realtime
-    port: 10015
+    port: 1235
     packetPreprocessorClassName: com.example.myproject.MyPacketPreprocessor
+    packetPreprocessorArgs:
+        timeOffset: 6
+        timeLength: 6
+        fractionLength: 2
+        timeEpoch: UNIX
 
   - name: udp-out
     class: org.yamcs.tctm.UdpTcDataLink
     stream: tc_realtime
     host: localhost
-    port: 10025
-    commandPostprocessorClassName: com.example.myproject.MyCommandPostprocessor
+    port: 1234
+    commandPostprocessorClassName: org.yamcs.tctm.cfs.CfsCommandPostprocessor
 
 mdb:
   # Configuration of the active loaders
   # Valid loaders are: sheet, xtce or fully qualified name of the class
   - type: xtce
     args:
+      file: mdb/ccsds.xml
+  - type: xtce
+    args:
       file: mdb/xtce.xml
+    subLoaders:
+      - type: xtce
+        args:
+          fileset: [mdb/subsystems/*.xml]
 
 # Configuration for streams created at server startup
 streamConfig:

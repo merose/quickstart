@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SpaceSystem
+  xmlns="http://www.omg.org/spec/XTCE/20180204"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xml:base="http://www.w3.org/2001/XInclude"
+  name="Ccsds"
+  shortDescription="Base packet and command definitions"
+  xsi:schemaLocation="http://www.omg.org/spec/XTCE/20180204
+  https://www.omg.org/spec/XTCE/20180204/SpaceSystem.xsd">
+  
+  <LongDescription>
+    Telemetry and commands definitions for the base CCSDS and cFS types. Based on CCSDS
+    XTCE documentation (https://public.ccsds.org/Pubs/660x2g2.pdf) and cFS base types.
+  </LongDescription>
+  
+  <TelemetryMetaData>
+    <ParameterTypeSet>
+      <IntegerParameterType name="CCSDS_Version_Type" signed="false">
+        <IntegerDataEncoding sizeInBits="3" encoding="unsigned"/>
+      </IntegerParameterType>
+      <EnumeratedParameterType name="CCSDS_Type_Type">
+        <IntegerDataEncoding sizeInBits="1"/>
+        <EnumerationList>
+          <Enumeration value="0" label="TM"/>
+          <Enumeration value="1" label="TC"/>
+        </EnumerationList>
+      </EnumeratedParameterType>
+      <BooleanParameterType name="CCSDS_Sec_Hdr_Flag_Type" zeroStringValue="NotPresent" oneStringValue="Present">
+        <IntegerDataEncoding sizeInBits="1" encoding="unsigned"/>
+      </BooleanParameterType>
+      <EnumeratedParameterType name="CCSDS_APID_Type">
+        <IntegerDataEncoding sizeInBits="11" encoding="unsigned"/>
+        <EnumerationList>
+          <!-- Insert additional APIDs here -->
+          <Enumeration value="2046" label="TEST_TLM"/>
+          <Enumeration value="2047" label="CCSDS_IDLE"/>
+        </EnumerationList>
+      </EnumeratedParameterType>
+      <EnumeratedParameterType name="CCSDS_Group_Flags_Type">
+        <UnitSet />
+        <IntegerDataEncoding sizeInBits="2" />
+        <EnumerationList>
+          <Enumeration value="0" label="Continuation" />
+          <Enumeration value="1" label="First" />
+          <Enumeration value="2" label="Last" />
+          <Enumeration value="3" label="Standalone" />
+        </EnumerationList>
+      </EnumeratedParameterType>
+      <IntegerParameterType name="CCSDS_Source_Sequence_Count_Type" signed="false">
+        <UnitSet />
+        <IntegerDataEncoding sizeInBits="14" />
+      </IntegerParameterType>
+      <IntegerParameterType name="CCSDS_Packet_Length_Type" signed="false" initialValue="0">
+        <UnitSet>
+          <Unit description="Size">Octets</Unit>
+        </UnitSet>
+        <IntegerDataEncoding sizeInBits="16" />
+      </IntegerParameterType>
+      <AbsoluteTimeParameterType name="PacketTimeType">
+        <Encoding scale=".0000152587890625">
+          <IntegerDataEncoding sizeInBits="48" byteOrder="mostSignificantByteFirst" encoding="twosComplement"/>
+        </Encoding>
+        <ReferenceTime>
+          <Epoch>UNIX</Epoch>
+        </ReferenceTime>
+      </AbsoluteTimeParameterType>
+    </ParameterTypeSet>
+    <ParameterSet>
+      <Parameter parameterTypeRef="CCSDS_Version_Type" name="packetVersion"/>
+      <Parameter parameterTypeRef="CCSDS_Type_Type" name="packetType"/>
+      <Parameter parameterTypeRef="CCSDS_Sec_Hdr_Flag_Type" name="secHdrFlag"/>
+      <Parameter parameterTypeRef="CCSDS_APID_Type" name="apid"/>
+      <Parameter parameterTypeRef="CCSDS_Group_Flags_Type" name="groupFlag"/>
+      <Parameter parameterTypeRef="CCSDS_Source_Sequence_Count_Type" name="sequenceCount"/>
+      <Parameter parameterTypeRef="CCSDS_Packet_Length_Type" name="packetLength"/>
+      <Parameter parameterTypeRef="PacketTimeType" name="packetTime"/>
+    </ParameterSet>
+    <ContainerSet>
+      <SequenceContainer name="SpacePacket" abstract="true">
+        <EntryList>
+          <ParameterRefEntry parameterRef="packetVersion"/>
+          <ParameterRefEntry parameterRef="packetType"/>
+          <ParameterRefEntry parameterRef="secHdrFlag"/>
+          <ParameterRefEntry parameterRef="apid"/>
+          <ParameterRefEntry parameterRef="groupFlag"/>
+          <ParameterRefEntry parameterRef="sequenceCount"/>
+          <ParameterRefEntry parameterRef="packetLength"/>
+        </EntryList>
+      </SequenceContainer>
+      <SequenceContainer name="IdlePacket">
+        <EntryList/>
+        <BaseContainer containerRef="SpacePacket">
+          <RestrictionCriteria>
+            <Comparison value="CCSDS_IDLE" parameterRef="apid"/>
+          </RestrictionCriteria>
+        </BaseContainer>
+      </SequenceContainer>
+      <SequenceContainer abstract="true" name="TelemetryHeader"
+        shortDescription="The base telemetry packet, currently empty">
+        <EntryList>
+          <ParameterRefEntry parameterRef="packetTime"/>
+        </EntryList>
+        <BaseContainer containerRef="SpacePacket">
+          <RestrictionCriteria>
+            <Comparison value="CCSDS_IDLE" parameterRef="apid" comparisonOperator="!="/>
+          </RestrictionCriteria>
+        </BaseContainer>
+      </SequenceContainer>
+    </ContainerSet>
+  </TelemetryMetaData>
+
+  <CommandMetaData>
+    <ArgumentTypeSet>
+      <IntegerArgumentType name="CCSDS_Version_Type" signed="false">
+        <IntegerDataEncoding sizeInBits="3" encoding="unsigned"/>
+      </IntegerArgumentType>
+      <EnumeratedArgumentType name="CCSDS_Type_Type">
+        <IntegerDataEncoding sizeInBits="1"/>
+        <EnumerationList>
+          <Enumeration value="0" label="TM"/>
+          <Enumeration value="1" label="TC"/>
+        </EnumerationList>
+      </EnumeratedArgumentType>
+      <BooleanArgumentType name="CCSDS_Sec_Hdr_Flag_Type" zeroStringValue="NotPresent" oneStringValue="Present">
+        <IntegerDataEncoding sizeInBits="1" encoding="unsigned"/>
+      </BooleanArgumentType>
+      <EnumeratedArgumentType name="CCSDS_APID_Type">
+        <IntegerDataEncoding sizeInBits="11" encoding="unsigned"/>
+        <EnumerationList>
+          <!-- Insert additional APIDs here -->
+          <Enumeration value="255" label="TRIO_CMD"/>
+          <Enumeration value="2046" label="SAMPLE_APID"/>
+          <Enumeration value="2047" label="CCSDS_IDLE"/>
+        </EnumerationList>
+      </EnumeratedArgumentType>
+      <EnumeratedArgumentType name="CCSDS_Group_Flags_Type">
+        <IntegerDataEncoding sizeInBits="2" />
+        <EnumerationList>
+          <Enumeration value="0" label="Continuation" />
+          <Enumeration value="1" label="First" />
+          <Enumeration value="2" label="Last" />
+          <Enumeration value="3" label="Standalone" />
+        </EnumerationList>
+      </EnumeratedArgumentType>
+      <IntegerArgumentType name="CCSDS_Source_Sequence_Count_Type" signed="false">
+        <IntegerDataEncoding sizeInBits="14" />
+      </IntegerArgumentType>
+      <IntegerArgumentType name="CCSDS_Packet_Length_Type" signed="false">
+        <IntegerDataEncoding sizeInBits="16" />
+      </IntegerArgumentType>
+      <EnumeratedArgumentType name="cFS_Opcode_Type">
+        <IntegerDataEncoding sizeInBits="8" encoding="unsigned"/>
+        <EnumerationList>
+          <!-- Insert additional opcodes here -->
+          <Enumeration value="133" label="TRIO_CDH_GET_MEM"/>
+          <Enumeration value="2047" label="SAMPLE_CMD"/>
+        </EnumerationList>
+      </EnumeratedArgumentType>
+      <IntegerArgumentType name="cFS_Checksum_Type">
+        <IntegerDataEncoding sizeInBits="8" encoding="unsigned"/>
+      </IntegerArgumentType>
+    </ArgumentTypeSet>
+    <MetaCommandSet>
+      <MetaCommand name="CommandPacket" abstract="true"
+        shortDescription="Base space packet structure for commands">
+        <ArgumentList>
+          <Argument argumentTypeRef="CCSDS_Version_Type" name="ccsdsVersion"/>
+          <Argument argumentTypeRef="CCSDS_Type_Type" name="packetType"/>
+          <Argument argumentTypeRef="CCSDS_Sec_Hdr_Flag_Type" name="secHdrFlag"/>
+          <Argument argumentTypeRef="CCSDS_APID_Type" name="apid"/>
+          <Argument argumentTypeRef="CCSDS_Group_Flags_Type" name="groupFlag"/>
+          <Argument argumentTypeRef="CCSDS_Source_Sequence_Count_Type" name="sequenceCount"/>
+          <Argument argumentTypeRef="CCSDS_Packet_Length_Type" name="packetLength"/>
+        </ArgumentList>
+        <CommandContainer name="CommandPacketContainer">
+          <EntryList>
+            <ArgumentRefEntry argumentRef="ccsdsVersion"/>
+            <ArgumentRefEntry argumentRef="packetType"/>
+            <ArgumentRefEntry argumentRef="secHdrFlag"/>
+            <ArgumentRefEntry argumentRef="apid"/>
+            <ArgumentRefEntry argumentRef="groupFlag"/>
+            <ArgumentRefEntry argumentRef="sequenceCount"/>
+            <ArgumentRefEntry argumentRef="packetLength"/>
+          </EntryList>
+        </CommandContainer>
+      </MetaCommand>
+      <MetaCommand name="cFSCommand" abstract="true">
+        <BaseMetaCommand metaCommandRef="CommandPacket">
+          <ArgumentAssignmentList>
+            <ArgumentAssignment argumentName="ccsdsVersion" argumentValue="0"/>
+            <ArgumentAssignment argumentName="packetType" argumentValue="TC"/>
+            <ArgumentAssignment argumentName="secHdrFlag" argumentValue="NotPresent"/>
+            <ArgumentAssignment argumentName="groupFlag" argumentValue="Standalone"/>
+            <ArgumentAssignment argumentName="sequenceCount" argumentValue="0"/>
+            <ArgumentAssignment argumentName="packetLength" argumentValue="0"/>
+          </ArgumentAssignmentList>
+        </BaseMetaCommand>
+        <ArgumentList>
+          <Argument argumentTypeRef="cFS_Opcode_Type" name="opCode"/>
+          <Argument argumentTypeRef="cFS_Checksum_Type" name="checksum"/>
+        </ArgumentList>
+        <CommandContainer name="cFSCommandContainer">
+          <EntryList>
+            <ArgumentRefEntry argumentRef="opCode"/>
+            <ArgumentRefEntry argumentRef="checksum"/>
+          </EntryList>
+        </CommandContainer>
+      </MetaCommand>
+      <MetaCommand name="CommandHeader" abstract="true"
+        shortDescription="The base command packet">
+        <BaseMetaCommand metaCommandRef="cFSCommand">
+          <ArgumentAssignmentList>
+            <ArgumentAssignment argumentName="checksum" argumentValue="0"/>
+          </ArgumentAssignmentList>
+        </BaseMetaCommand>
+        <CommandContainer name="CommandHeaderContainer">
+          <EntryList/>
+        </CommandContainer>
+      </MetaCommand>      
+    </MetaCommandSet>
+  </CommandMetaData>
+  
+</SpaceSystem>
